@@ -6,6 +6,7 @@ When working with an IDA database through the `ida` MCP server:
 - Never find code by searching strings or names. Navigate by entry points, imports, xrefs, and the call graph. Use strings only to confirm a hypothesis.
 - Always set `timeout` to `86400` on every `execute_python` call. The default is only 360 seconds. Never use a smaller value.
 - Decompile with Hex-Rays instead of reading only disassembly. If the decompiler is unavailable for the architecture, say so.
+- If the code is obfuscated or IDA can't read it (flattening, opaque predicates, junk code, anti-disassembly), deobfuscate it instead of giving up.
 - Never skip a function because it is large. Large functions are usually the most important: decompile them, reading long output in slices.
 - Rename functions and variables, set types, and add comments as you learn, then re-decompile.
 - Label claims `confirmed`, `likely`, or `guess`, and cite evidence.
