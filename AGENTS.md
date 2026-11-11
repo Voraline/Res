@@ -56,6 +56,21 @@ Large functions are usually the most important (parsers, dispatchers, crypto, ma
 - **Verify:** reimplement non-trivial algorithms in Python and test against binary data. Cite evidence (pseudocode lines, constants, callers) for claims; label the rest `guess`.
 - **Efficiency:** batch several decompiles per `execute_python` call, print compact output (address, name, summary), stay focused on the user's goal.
 
+## Obfuscated or unreadable code: deobfuscate it
+
+If the decompiler fails, output is garbage, or IDA mis-reads the code, don't give up and don't fall back to string search. Name the technique, then remove it.
+
+**Signs:** one big loop + `switch` on a state variable (control-flow flattening); conditions that are always true/false (opaque predicates); junk or dead code; jumps into the middle of instructions or overlapping instructions (anti-disassembly); indirect `jmp`/`call` through tables; "positive sp value" or `JUMPOUT` errors; encrypted strings; hashed API resolution; packed or self-modifying code.
+
+**Process:**
+1. **Fix IDA's view first.** Undefine and redefine bad code, fix function bounds (`del_func`/`add_func`), correct stack deltas, and add missing code xrefs for resolved indirect jumps (`ida_xref.add_cref`). Check `reference` for the exact 9.x calls. Re-run analysis and re-decompile after each fix.
+2. **Patch with scripts, not by hand.** NOP junk, turn opaque conditionals into unconditional jumps, and rewrite flattened-block exits with `ida_bytes.patch_bytes`. Log every patch (address, old bytes, new bytes, reason) in the notes file so it is reversible. Test the pattern on one function before applying it to all.
+3. **Control-flow flattening:** find the dispatcher (many predecessors, compares the state variable) and the state variable. For each real block, work out its next-state constant(s), map state to block, then patch each block's exit to jump straight to its successor (both targets for conditionals). Resolve next states by reading the constants, or by emulating or symbolically executing the block (Unicorn, Qiling, Triton, angr, or miasm if available in IDA's Python; otherwise write a small emulator for the pattern).
+4. **Indirect jumps and call tables:** evaluate the table or emulate to get every target, add the xrefs, and redefine the targets as code.
+5. **Strings, API hashing, packing:** reimplement the decoder or hash in Python and apply it to everything. For packers, emulate to the original entry point and dump the unpacked image, then load it into IDA. Prefer emulation over executing the sample natively, and don't run it on the user's machine unless they ask.
+6. **Heavy cases:** if patching is impractical, a Hex-Rays microcode optimizer can simplify it inside the decompiler, but only after simpler options fail.
+7. **Iterate and verify.** After each pass, re-decompile and check the result is clearer and behaviorally consistent. Repeat until readable. If a technique fails, try another and record what was tried. Report anything left obfuscated and why.
+
 ## Final report (full mode)
 
 1. **Summary:** what the binary does, in 3-5 sentences.
