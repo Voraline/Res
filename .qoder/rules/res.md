@@ -11,7 +11,3 @@ When working with an IDA database through the `ida` MCP server:
 - Rename functions and variables, set types, and add comments as you learn, then re-decompile.
 - Label claims `confirmed`, `likely`, or `guess`, and cite evidence.
 - If an IDAPython call errors, check the `reference` tool and retry. Do not fall back to string search.
-
-## Loading the skill
-
-If the user asks to reverse, analyze, or decompile a binary, or says "load res" or "load res:res", and the `res` skill is not already loaded in this conversation, load it first, then follow it. A leading `quick` or `full` in the request is the mode. Do not ask whether to load it; just load it.
