@@ -1,0 +1,8 @@
+{
+  "name": "res",
+  "version": "1.5.1",
+  "description": "Reverse engineering with IDA MCP: structure-first analysis, IDA-only deobfuscation, quick/full modes, forces decompiling big functions, annotates as it goes.",
+  "keywords": ["reverse-engineering", "ida", "decompiler", "binary-analysis", "deobfuscation"],
+  "skills": "./skills/",
+  "rules": "./.qoder/rules/"
+}
